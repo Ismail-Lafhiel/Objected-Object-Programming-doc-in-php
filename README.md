@@ -289,3 +289,210 @@ You use the open arrow from the child class to the parent class to represent the
 - A class that inherits another class is called a subclass, a child class, or a derived class. The class from which the subclass inherits is a parent class, a superclass, or a base class.
 - A subclass can have its own properties and methods.
 - Use ```$this``` keyword to call the methods of the parent class from methods in the child class.
+
+### How to Call the Parent Constructor
+#### Child class doesn’t have a constructor
+The following adds a constructor to the ```BankAccount``` class, which accepts the ```$balance``` parameter. The constructor assigns the ```$balance``` argument to the ```$balance``` property:
+
+```php
+<?php
+
+class BankAccount
+{
+	private $balance;
+
+	public function __construct($balance)
+	{
+		$this->balance = $balance;
+	}
+
+	public function getBalance()
+	{
+		return $this->balance;
+	}
+
+	public function deposit($amount)
+	{
+		if ($amount > 0) {
+			$this->balance += $amount;
+		}
+
+		return $this;
+	}
+}
+```
+The ```SavingAccount``` class remains the same and doesn’t include its own constructor:
+```php
+<?php 
+
+class SavingAccount extends BankAccount
+{
+	private $interestRate;
+
+	public function setInterestRate($interestRate)
+	{
+		$this->interestRate = $interestRate;
+	}
+
+	public function addInterest()
+	{
+		// calculate interest
+		$interest = $this->interestRate * $this->getBalance();
+		// deposit interest to the balance
+		$this->deposit($interest);
+	}
+}
+```
+
+When you create a new instance of the ```SavingAccount```, PHP will call the constructor of the ```SavingAccount``` class. However, PHP cannot find the constructor in the ```SavingAccount``` class. Therefore, it continues to search for the constructor of the parent class of the ```SavingAccount``` class, which is the ```BankAccount``` class. And it invokes the constructor of the ```BankAccount``` class.
+
+If you don’t pass an argument to the constructor of the ```SavingAccount``` class, you’ll get an error:
+```php
+$account = new SavingAccount();
+```
+##### Error:
+```php
+Fatal error: Uncaught ArgumentCountError: Too few arguments to function BankAccount::__construct(), 0 passed in ... on line 5 and exactly 1 expected in ...
+```
+But if you pass an argument to the constructor, it’ll work perfectly:
+
+```php
+$account = new SavingAccount(100);
+```
+### Define a constructor in the child class
+A child class can have its own constructor. For example, you can add a constructor to the ```SavingAccount``` class as follows:
+
+```php
+<?php
+
+class SavingAccount extends BankAccount
+{
+	private $interestRate;
+
+	public function __construct($interestRate)
+	{
+		$this->interestRate = $interestRate;
+	}
+
+	public function setInterestRate($interestRate)
+	{
+		$this->interestRate = $interestRate;
+	}
+
+	public function addInterest()
+	{
+		// calculate interest
+		$interest = $this->interestRate * $this->getBalance();
+		// deposit interest to the balance
+		$this->deposit($interest);
+	}
+}
+```
+The ```SavingAccount``` class has a constructor that initializes the ```interestRate``` property.
+
+When a child class has its own constructor, the constructor in the child class will not call the constructor of its parent class automatically.
+
+For example, the following creates a new instance of the ```SavingAccount``` class and initializes the ```$interestRate``` property to the value ```0.05```
+
+```php
+$account = new SavingAccount(0.05);
+```
+To call the constructor of the parent class from the constructor of the child class, you use the ```parent::__construct(arguments)``` syntax.
+
+The following changes the constructor of the ```SavingAccount``` class that accepts two arguments: balance & interest rate. It also calls the constructor of the ```BankAccount``` class to initialize the ```$balance``` property:
+
+```php
+
+<?php
+
+class SavingAccount extends BankAccount
+{
+	private $interestRate;
+
+	public function __construct($balance, $interestRate)
+	{
+		parent::__construct($balance);
+
+		$this->interestRate = $interestRate;
+	}
+
+	public function setInterestRate($interestRate)
+	{
+		$this->interestRate = $interestRate;
+	}
+
+	public function addInterest()
+	{
+		// calculate interest
+		$interest = $this->interestRate * $this->getBalance();
+		// deposit interest to the balance
+		$this->deposit($interest);
+	}
+}
+```
+The syntax for calling the parent constructor is the same as a regular method.
+
+Put it all together:
+
+```php
+<?php
+
+class BankAccount
+{
+	private $balance;
+
+	public function __construct($balance)
+	{
+		$this->balance = $balance;
+	}
+
+	public function getBalance()
+	{
+		return $this->balance;
+	}
+
+	public function deposit($amount)
+	{
+		if ($amount > 0) {
+			$this->balance += $amount;
+		}
+
+		return $this;
+	}
+}
+
+class SavingAccount extends BankAccount
+{
+	private $interestRate;
+
+	public function __construct($balance, $interestRate)
+	{
+		parent::__construct($balance);
+		$this->interestRate = $interestRate;
+	}
+
+	public function setInterestRate($interestRate)
+	{
+		$this->interestRate = $interestRate;
+	}
+
+	public function addInterest()
+	{
+		$interest = $this->interestRate * $this->getBalance();
+		$this->deposit($interest);
+	}
+}
+
+$account = new SavingAccount(100, 0.05);
+$account->addInterest();
+echo $account->getBalance();
+```
+
+The following class diagram illustrates inheritance between the ```SavingAccount``` and ```BankAccount``` classes:
+
+//img 
+
+### Summary
+- The constructor of the child class doesn’t automatically call the constructor of its parent class.
+- Use ```parent::__construct(arguments)``` to call the parent constructor from the constructor in the child class.
+
