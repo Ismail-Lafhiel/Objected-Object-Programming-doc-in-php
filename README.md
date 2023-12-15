@@ -496,3 +496,133 @@ The following class diagram illustrates inheritance between the ```SavingAccount
 - The constructor of the child class doesn’t automatically call the constructor of its parent class.
 - Use ```parent::__construct(arguments)``` to call the parent constructor from the constructor in the child class.
 
+## PHP Method Overriding
+### Introduction
+Method overriding in PHP allows a child class to redefine a method that is already provided by its parent class. This documentation provides a comprehensive overview of method overriding in PHP, including its syntax, usage, and best practices.
+### Syntax
+To override a method in a child class, use the same method signature (name, parameters, and return type) as the method in the parent class. When an object of the parent class invokes the method, PHP executes the overridden method, while an object of the child class invokes the method, PHP executes the overriding method.
+### Example
+```php
+<?php
+
+class Robot {
+    public function greet() {
+        return 'Hello!';
+    }
+}
+
+class Android extends Robot {
+    public function greet() {
+        return 'Hi';
+    }
+}
+
+$robot = new Robot();
+echo $robot->greet(); // Output: Hello
+
+$android = new Android();
+echo $android->greet(); // Output: Hi
+
+```
+In this example, the ```greet()``` method is overridden in the ```Android``` class to return a different greeting message than the ```Robot``` class.
+
+### Calling the Overridden Method
+To call the overridden method within the overriding method, use the ```parent::``` keyword followed by the method name. This allows access to the overridden method's functionality within the overriding method.
+```php
+<?php
+
+class Android extends Robot {
+    public function greet() {
+        $greeting = parent::greet();
+        return $greeting . ' from Android.';
+    }
+}
+
+```
+In this example, the ```greet()``` method in the Android class calls the ```greet()``` method of the Robot class and appends additional text to the returned greeting.
+### Preventing Method Overriding
+To prevent a method in the child class from overriding a method in the parent class, use the ```final``` keyword when defining the method in the parent class.
+```php
+<?php
+class Robot {
+    final public function id() {
+        return uniqid();
+    }
+}
+```
+If an attempt is made to override a ```final``` method in the child class, an error will be thrown.
+### Conclusion
+Method overriding in PHP provides flexibility in defining specific behaviors for methods in child classes while maintaining a clear inheritance structure. By following the syntax and best practices outlined in this documentation, developers can effectively utilize method overriding to create well-structured and maintainable PHP code.
+
+## PHP Protected Access Modifier
+### Introduction
+This documentation provides a comprehensive overview of the PHP protected access modifier, which allows properties and methods to be accessed within the class and any child classes that extend the class. You will learn about the syntax, usage, and examples of using the protected access modifier in PHP.
+### Syntax
+In PHP, you can define a ```protected``` property using the protected keyword followed by the property name. Similarly, a protected method is defined using the ```protected``` keyword before the method name.
+```php
+<?php
+class MyClass {
+    protected $propertyName;
+
+    protected function methodName() {
+        // ...
+    }
+}
+```
+### Example: PHP Protected Property
+In the following example, the Customer class has a protected property ```$name```, and the ```VIP``` class extends the ```Customer``` class to access the protected property.
+```php
+<?php
+class Customer {
+    protected $name;
+
+    public function __construct($name) {
+        $this->name = $name;
+    }
+}
+
+class VIP extends Customer {
+    public function getFormattedName() {
+        return ucwords($this->name);
+    }
+}
+
+$alex = new VIP('alex ferguson');
+echo $alex->getFormattedName(); // Output: Alex Ferguson
+```
+### Example: PHP Protected Method
+In this example, the ```Customer``` class has a protected property ```$name``` and a protected method ```format()```. The ```VIP``` class extends the ```Customer``` class and overrides the ```format()``` method.
+
+```php
+<?php
+class Customer {
+    protected $name;
+
+    public function __construct($name) {
+        $this->name = $name;
+    }
+
+    protected function format() {
+        return ucwords($this->name);
+    }
+
+    public function getName() {
+        return $this->format($this->name);
+    }
+}
+
+class VIP extends Customer {
+    protected function format() {
+        return strtoupper($this->name);
+    }
+}
+
+$bob = new Customer('bob allen');
+echo $bob->getName(); // Output: Bob Allen
+
+$alex = new VIP('alex ferguson');
+echo $alex->getName(); // Output: ALEX FERGUSON
+```
+In this example, the getName() method calls the format() method of the Customer class for the bob instance and the VIP class for the alex instance, demonstrating the usage of protected methods in inheritance.
+### Summary
+The PHP protected access modifier allows properties and methods to be accessed within the class and any child classes of the class. It provides a way to encapsulate data and behavior within a class hierarchy while allowing child classes to access and modify the protected members.
